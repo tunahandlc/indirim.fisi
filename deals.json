@@ -1,0 +1,65 @@
+[
+  {
+    "store": "trendyol",
+    "name": "Koşu Ayakkabısı (örnek)",
+    "price": 899,
+    "ref_price": 1499,
+    "url": "https://www.trendyol.com/sr?q=Ko%C5%9Fu+Ayakkab%C4%B1s%C4%B1",
+    "checked_at": "demo",
+    "discount_pct": 40
+  },
+  {
+    "store": "hepsiburada",
+    "name": "Buharlı Ütü (örnek)",
+    "price": 649,
+    "ref_price": 999,
+    "url": "https://www.hepsiburada.com/ara?q=Buharl%C4%B1+%C3%9Ct%C3%BC",
+    "checked_at": "demo",
+    "discount_pct": 35
+  },
+  {
+    "store": "trendyol",
+    "name": "Kablosuz Kulaklık Pro (örnek)",
+    "price": 1249,
+    "ref_price": 1890,
+    "url": "https://www.trendyol.com/sr?q=Kablosuz+Kulakl%C4%B1k+Pro",
+    "checked_at": "demo",
+    "discount_pct": 34
+  },
+  {
+    "store": "n11",
+    "name": "Robot Süpürge X200 (örnek)",
+    "price": 3799,
+    "ref_price": 5499,
+    "url": "https://www.n11.com/arama?q=Robot+S%C3%BCp%C3%BCrge+X200",
+    "checked_at": "demo",
+    "discount_pct": 31
+  },
+  {
+    "store": "trendyol",
+    "name": "Bluetooth Hoparlör (örnek)",
+    "price": 799,
+    "ref_price": 950,
+    "url": "https://www.trendyol.com/sr?q=Bluetooth+Hoparl%C3%B6r",
+    "checked_at": "demo",
+    "discount_pct": 16
+  },
+  {
+    "store": "hepsiburada",
+    "name": "Akıllı Saat Lite (örnek)",
+    "price": 2399,
+    "ref_price": 2470,
+    "url": "https://www.hepsiburada.com/ara?q=Ak%C4%B1ll%C4%B1+Saat+Lite",
+    "checked_at": "demo",
+    "discount_pct": 3
+  },
+  {
+    "store": "amazon",
+    "name": "Otomatik Kahve Makinesi (örnek)",
+    "price": 1599,
+    "ref_price": 1599,
+    "url": "https://www.amazon.com.tr/s?k=Otomatik+Kahve+Makinesi",
+    "checked_at": "demo",
+    "discount_pct": 0
+  }
+]

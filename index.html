@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="theme-color" content="#211D16">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>İndirim Fişi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --page-bg:#C9C2AE;
+    --paper:#F3EFE3;
+    --paper-shadow:rgba(28,24,16,0.28);
+    --ink:#211D16;
+    --muted:#847C68;
+    --line:#CAC1A8;
+    --red:#A8371E;
+    --green:#29614A;
+    --amber:#8C6B1F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--page-bg);
+    font-family:'Space Grotesk', sans-serif;
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:28px 14px 60px;
+    min-height:100vh;
+  }
+  .receipt{
+    width:100%;
+    max-width:400px;
+    background:var(--paper);
+    border-radius:2px 10px 3px 12px;
+    box-shadow:0 18px 34px var(--paper-shadow);
+    padding:22px 20px 18px;
+  }
+  .head{ text-align:center; margin-bottom:14px; }
+  .mark{ font-weight:700; letter-spacing:2px; font-size:15px; }
+  .sub{ color:var(--muted); font-size:12.5px; margin-top:4px; }
+  .barcode{
+    height:26px; margin-top:14px;
+    background:repeating-linear-gradient(90deg, var(--ink) 0 2px, transparent 2px 5px, var(--ink) 5px 6px, transparent 6px 11px, var(--ink) 11px 13px, transparent 13px 17px);
+  }
+  .cut{ border-top:2px dashed var(--line); margin:16px 0; }
+
+  .scan-status{
+    display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--muted);
+    margin-top:14px; line-height:1.4;
+  }
+  .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--green);
+    flex-shrink:0; animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:0.3; } }
+
+  .add-block label{ font-size:11.5px; color:var(--muted); display:block; margin-bottom:6px; }
+  .add-row{ display:flex; gap:6px; }
+  .add-row input{
+    flex:1; min-width:0; padding:9px 10px; border:1px solid var(--line);
+    border-radius:4px; background:#fff; font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color:var(--ink);
+  }
+  .add-row input::placeholder{ color:#B5AD98; }
+  .add-row button{
+    padding:9px 14px; border:1px solid var(--ink); background:var(--ink); color:var(--paper);
+    border-radius:4px; font-family:'Space Grotesk', sans-serif; font-weight:500; font-size:13px;
+    cursor:pointer;
+  }
+  .add-row button:active{ transform:translateY(1px); }
+  .note{ font-size:11.5px; color:var(--muted); margin:8px 2px 0; line-height:1.5; }
+  .note.hidden{ display:none; }
+
+  .filters{ display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; }
+  .chip{
+    padding:6px 11px; border:1px solid var(--line); background:transparent;
+    border-radius:20px; font-family:'Space Grotesk', sans-serif; font-size:12px;
+    color:var(--ink); cursor:pointer;
+  }
+  .chip.active{ background:var(--ink); border-color:var(--ink); color:var(--paper); }
+
+  .threshold{ margin-top:16px; }
+  .threshold label{ font-size:12px; color:var(--muted); display:block; margin-bottom:9px; }
+  .threshold label span{ color:var(--ink); font-family:'IBM Plex Mono', monospace; font-weight:600; }
+  input[type="range"]{
+    -webkit-appearance:none; appearance:none; width:100%; height:2px;
+    background:var(--line); outline:none; margin:0;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:18px; height:18px; border-radius:50%;
+    background:var(--ink); cursor:pointer; border:3px solid var(--paper);
+    box-shadow:0 0 0 1px var(--ink);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:18px; height:18px; border-radius:50%; border:3px solid var(--paper);
+    background:var(--ink); cursor:pointer; box-shadow:0 0 0 1px var(--ink);
+  }
+
+  .items{ list-style:none; margin:0; padding:0; }
+  .item{ border-bottom:1px dashed var(--line); }
+  .item:last-child{ border-bottom:none; }
+  .item-link{ display:block; padding:14px 0; color:inherit; text-decoration:none; }
+  .item-link:active{ opacity:0.65; }
+  .item-top{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:5px; }
+  .store{ font-size:11px; letter-spacing:0.5px; color:var(--muted); text-transform:uppercase; }
+  .store::after{ content:" ↗"; opacity:0.55; letter-spacing:0; }
+  .checked{ font-family:'IBM Plex Mono', monospace; font-size:10.5px; color:#B5AD98; }
+  .name{ font-size:14.5px; font-weight:500; margin-bottom:6px; }
+  .price-row{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:8px; }
+  .price{ font-family:'IBM Plex Mono', monospace; font-size:19px; font-weight:600; }
+  .ref{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--muted); text-decoration:line-through; }
+  .ref-label{ font-family:'Space Grotesk',sans-serif; font-size:11px; color:var(--muted); text-decoration:none; }
+
+  .stamp{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:10.5px;
+    letter-spacing:0.5px; text-transform:uppercase; padding:3px 9px; border-radius:3px;
+    transform:rotate(-2deg);
+  }
+  .stamp-good{ border:2px solid var(--green); color:var(--green); }
+  .stamp-bad{ border:2px solid var(--amber); color:var(--amber); }
+
+  .empty{ list-style:none; padding:26px 4px; text-align:center; color:var(--muted); font-size:13px; line-height:1.6; }
+
+  .foot{ text-align:center; }
+  .total{
+    display:flex; justify-content:space-between; font-family:'IBM Plex Mono', monospace;
+    font-size:13px; margin-bottom:10px;
+  }
+  .fine{ font-size:11px; color:var(--muted); margin:0; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="receipt">
+  <header class="head">
+    <div class="mark">★ İNDİRİM FİŞİ ★</div>
+    <div class="sub">4 mağazayı otomatik tarar, gerçek indirimi sahteden ayırır</div>
+    <div class="barcode" aria-hidden="true"></div>
+  </header>
+
+  <section class="scan-status">
+    <span class="dot" aria-hidden="true"></span>
+    4 mağaza otomatik taranıyor · Trendyol · N11 · Hepsiburada · Amazon
+  </section>
+
+  <div class="cut"></div>
+
+  <section class="filters" id="filters">
+    <button class="chip active" data-store="all">tümü</button>
+    <button class="chip" data-store="trendyol">Trendyol</button>
+    <button class="chip" data-store="n11">N11</button>
+    <button class="chip" data-store="hepsiburada">Hepsiburada</button>
+    <button class="chip" data-store="amazon">Amazon</button>
+  </section>
+  <div class="threshold">
+    <label for="minDiscount">en az <span id="minDiscountVal">25</span>% gerçek indirim göster</label>
+    <input type="range" id="minDiscount" min="0" max="50" step="5" value="25">
+  </div>
+
+  <div class="cut"></div>
+
+  <ul class="items" id="itemList">
+    <li class="empty">Yükleniyor…</li>
+  </ul>
+
+  <div class="cut"></div>
+
+  <footer class="foot">
+    <div class="total"><span>eşiği geçen ürün</span><span id="totalGenuine">0</span></div>
+    <p class="fine">veriler deals.json'dan gelir · her birkaç saatte otomatik güncellenir</p>
+  </footer>
+</div>
+
+<script>
+  const searchBase = {
+    trendyol: 'https://www.trendyol.com/sr?q=',
+    n11: 'https://www.n11.com/arama?q=',
+    hepsiburada: 'https://www.hepsiburada.com/ara?q=',
+    amazon: 'https://www.amazon.com.tr/s?k='
+  };
+  const storeLabels = { trendyol: 'Trendyol', n11: 'N11', hepsiburada: 'Hepsiburada', amazon: 'Amazon' };
+
+  const minDiscount = document.getElementById('minDiscount');
+  const minDiscountVal = document.getElementById('minDiscountVal');
+  let items = [];
+
+  function escapeHtml(str){
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function formatPrice(n){
+    return new Intl.NumberFormat('tr-TR').format(Math.round(n)) + ' ₺';
+  }
+  function timeAgo(iso){
+    if(!iso || iso === 'demo') return 'örnek veri';
+    const mins = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+    if(mins < 1) return 'az önce';
+    if(mins < 60) return mins + ' dk önce';
+    return Math.round(mins / 60) + ' sa önce';
+  }
+  function renderItem(d){
+    const base = searchBase[d.store];
+    const fallbackHref = base ? base + encodeURIComponent(d.name).replace(/%20/g, '+') : '#';
+    const href = (d.url && /^https?:\/\//.test(d.url)) ? d.url : fallbackHref;
+    return `<li class="item" data-store="${d.store}" data-discount="${d.discount_pct}">
+        <a class="item-link" href="${href}" target="_blank" rel="noopener">
+          <div class="item-top"><span class="store">${storeLabels[d.store] || d.store}</span><span class="checked">${timeAgo(d.checked_at)}</span></div>
+          <div class="name">${escapeHtml(d.name)}</div>
+          <div class="price-row">
+            <span class="price">${formatPrice(d.price)}</span>
+            <span class="ref">${formatPrice(d.ref_price)}</span><span class="ref-label">son 10 gün dip</span>
+          </div>
+          <span class="stamp"></span>
+        </a>
+      </li>`;
+  }
+
+  function applyFilters(){
+    const activeChip = document.querySelector('.chip.active');
+    const activeStore = activeChip ? activeChip.dataset.store : 'all';
+    const threshold = parseInt(minDiscount.value, 10);
+    minDiscountVal.textContent = threshold;
+
+    let visibleCount = 0;
+    items.forEach(li => {
+      const storeMatch = activeStore === 'all' || li.dataset.store === activeStore;
+      const discount = parseInt(li.dataset.discount, 10);
+      const passes = discount >= threshold;
+      const show = storeMatch && passes;
+      li.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+
+      const stamp = li.querySelector('.stamp');
+      if(passes){
+        stamp.className = 'stamp stamp-good';
+        stamp.textContent = '✓ gerçek indirim · %' + discount;
+      } else {
+        stamp.className = 'stamp stamp-bad';
+        stamp.textContent = '%' + discount + ' · eşiğin altında';
+      }
+    });
+    document.getElementById('totalGenuine').textContent = visibleCount;
+  }
+
+  async function loadDeals(){
+    const list = document.getElementById('itemList');
+    try {
+      const res = await fetch('./deals.json', { cache: 'no-store' });
+      if(!res.ok) throw new Error('deals.json okunamadı: ' + res.status);
+      const deals = await res.json();
+      if(!Array.isArray(deals) || deals.length === 0){
+        list.innerHTML = '<li class="empty">Henüz taranmış ürün yok — GitHub Actions ilk çalıştığında burası dolacak.</li>';
+        return;
+      }
+      list.innerHTML = deals.map(renderItem).join('');
+      items = Array.from(document.querySelectorAll('.item'));
+      applyFilters();
+    } catch (err) {
+      list.innerHTML = '<li class="empty">Veriler yüklenemedi. Bu dosyayı bilgisayarında çift tıklayıp doğrudan açtıysan bu beklenir (tarayıcı güvenlik kısıtlaması) — GitHub Pages\'e yükleyince düzelir.</li>';
+      console.error(err);
+    }
+  }
+
+  document.getElementById('filters').addEventListener('click', (e) => {
+    const btn = e.target.closest('.chip');
+    if(!btn) return;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    applyFilters();
+  });
+  minDiscount.addEventListener('input', applyFilters);
+
+  loadDeals();
+</script>
+</body>
+</html>
